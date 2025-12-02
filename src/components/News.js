@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
-import NewsItem from './NewsItem'
+import React, { Component } from 'react';
+import NewsItem from './NewsItem';
+import fallbackImg from '../assets/fallback.jpg';
 
 export class News extends Component {
-
   constructor() {
     super();
     this.state = {
@@ -11,10 +11,15 @@ export class News extends Component {
   }
 
   async componentDidMount() {
-    let url = "https://newsapi.org/v2/top-headlines?country=us&apiKey=7f26e1590bd540e7af9d4c233412ed23";
-    let data = await fetch(url);
-    let parsedData = await data.json();
-    this.setState({ articles: parsedData.articles });
+    try {
+      let url = "https://newsapi.org/v2/top-headlines?country=us&apiKey=7f26e1590bd540e7af9d4c233412ed23";
+      let data = await fetch(url);
+      let parsedData = await data.json();
+      this.setState({ articles: parsedData.articles || [] });
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      this.setState({ articles: [] });
+    }
   }
 
   render() {
@@ -22,13 +27,25 @@ export class News extends Component {
 
     for (let i = 0; i < this.state.articles.length; i++) {
       let article = this.state.articles[i];
-      let desc = article.description
-      if (desc !== null && desc !== undefined) {
-        if (desc.split("").length > 100) {
-          desc = desc.split("").splice(0, 97).join("") + "..."
-        }
+
+      let title = article.title || "No Title";
+      let desc = article.description || "No description available.";
+      if (desc.length > 100) {
+        desc = desc.substring(0, 97) + "...";
       }
-      items.push(<NewsItem title={article.title} desc={desc} imgUrl={article.urlToImage} newsUrl={article.url} />);
+
+      let imgUrl = article.urlToImage || fallbackImg;
+      let newsUrl = article.url || "#";
+
+      items.push(
+        <NewsItem
+          key={i}
+          title={title}
+          desc={desc}
+          imgUrl={imgUrl}
+          newsUrl={newsUrl}
+        />
+      );
     }
 
     return (
@@ -37,8 +54,6 @@ export class News extends Component {
       </div>
     );
   }
-
 }
 
-export default News
-
+export default News;
