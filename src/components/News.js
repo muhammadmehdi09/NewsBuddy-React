@@ -12,10 +12,9 @@ export class News extends Component {
 
   async componentDidMount() {
     try {
-      // Fetch news from backend proxy to avoid CORS/426 issues
-      let response = await fetch('http://localhost:5000/news');
+      let response = await fetch('https://inshortsapi.vercel.app/news?category=all');
       let parsedData = await response.json();
-      this.setState({ articles: parsedData.articles || [] });
+      this.setState({ articles: parsedData.data || [] });
     } catch (error) {
       console.error("Error fetching news:", error);
       this.setState({ articles: [] });
@@ -29,13 +28,13 @@ export class News extends Component {
       let article = this.state.articles[i];
 
       let title = article.title || "No Title";
-      let desc = article.description || "No description available.";
+      let desc = article.content || "No description available.";
       if (desc.length > 100) {
         desc = desc.substring(0, 97) + "...";
       }
 
-      let imgUrl = article.urlToImage || fallbackImg;
-      let newsUrl = article.url || "#";
+      let imgUrl = article.imageUrl || fallbackImg;
+      let newsUrl = article.readMoreUrl || "#";
 
       items.push(
         <NewsItem
