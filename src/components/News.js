@@ -12,9 +12,9 @@ export class News extends Component {
 
   async componentDidMount() {
     try {
-      let url = "https://newsapi.org/v2/top-headlines?country=us&apiKey=7f26e1590bd540e7af9d4c233412ed23";
-      let data = await fetch(url);
-      let parsedData = await data.json();
+      // Fetch news from backend proxy to avoid CORS/426 issues
+      let response = await fetch('http://localhost:5000/news');
+      let parsedData = await response.json();
       this.setState({ articles: parsedData.articles || [] });
     } catch (error) {
       console.error("Error fetching news:", error);
